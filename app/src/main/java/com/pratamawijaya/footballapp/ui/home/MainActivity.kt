@@ -1,5 +1,6 @@
 package com.pratamawijaya.footballapp.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -10,6 +11,7 @@ import com.pratamawijaya.footballapp.data.mapper.TeamMapper
 import com.pratamawijaya.footballapp.data.repository.TeamRepository
 import com.pratamawijaya.footballapp.data.repository.TeamRepositoryImpl
 import com.pratamawijaya.footballapp.domain.Team
+import com.pratamawijaya.footballapp.ui.teamdetail.DetailTeamActivity
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Section
@@ -22,7 +24,7 @@ import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.recyclerview.v7.recyclerView
 import org.jetbrains.anko.wrapContent
 
-class MainActivity : AppCompatActivity(), MainView {
+class MainActivity : AppCompatActivity(), MainView, TeamListener {
 
     lateinit var presenter: MainPresenter
     lateinit var repo: TeamRepository
@@ -54,19 +56,34 @@ class MainActivity : AppCompatActivity(), MainView {
         teams.map {
             Log.d("tag", "team -> ${it.name}")
             Section().apply {
-                add(TeamItem(it))
+                add(TeamItem(it, this@MainActivity))
                 groupAdapter.add(this)
             }
         }
     }
+
+    override fun onTeamClick(team: Team) {
+        val intent = Intent(this, DetailTeamActivity::class.java)
+        val bundle = Bundle()
+        bundle.putParcelable("team", team)
+        intent.putExtras(bundle)
+
+        startActivity(intent)
+    }
 }
 
-class TeamItem constructor(private val team: Team) : Item() {
+interface TeamListener {
+    fun onTeamClick(team: Team)
+}
+
+class TeamItem constructor(private val team: Team,
+                           private val listener: TeamListener) : Item() {
     override fun bind(viewHolder: ViewHolder, position: Int) {
         viewHolder.itemView.teamName.text = team.name
         Picasso.get().load(team.badge).into(viewHolder.itemView.imgTeam)
+
+        viewHolder.itemView.setOnClickListener { listener.onTeamClick(team) }
     }
 
     override fun getLayout(): Int = R.layout.item_team
-
 }
