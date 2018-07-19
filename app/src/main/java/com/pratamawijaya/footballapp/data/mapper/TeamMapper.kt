@@ -7,14 +7,16 @@ class TeamMapper : DomainMapper<Team, TeamModel> {
     override fun mapFromModel(model: TeamModel): Team {
         return Team(
                 name = model.strTeam,
-                badge = model.strTeamBadge
+                badge = model.strTeamBadge,
+                desc = model.strDescriptionEN
         )
     }
 
     override fun mapToModel(domain: Team): TeamModel {
         return TeamModel(
                 strTeam = domain.name,
-                strTeamBadge = domain.badge
+                strTeamBadge = domain.badge,
+                strDescriptionEN = domain.desc
         )
     }
 
