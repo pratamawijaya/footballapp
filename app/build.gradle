@@ -11,6 +11,9 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "BASE_URL", "\"https://www.thesportsdb.com/\""
+        buildConfigField "String", "TSDB_API_KEY", "\"1\""
     }
     buildTypes {
         release {
@@ -20,32 +23,49 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def requested = details.requested
+        if (requested.group == 'com.android.support') {
+            if (!requested.name.startsWith("multidex")) {
+                details.useVersion '27.1.1'
+            }
+        } else if (requested.group == "com.google.android.gms") {
+            details.useVersion '11.8.0'
+        } else if (requested.group == "com.google.firebase") {
+            details.useVersion '11.8.0'
+        }
+
+    }
+}
+
 androidExtensions {
     experimental = true
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.0'
     implementation "com.android.support:recyclerview-v7:27.1.0"
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 
+    // anko
     implementation "org.jetbrains.anko:anko:$anko_version"
+    implementation "org.jetbrains.anko:anko-design:$anko_version"
+    // Anko Commons
+    implementation "org.jetbrains.anko:anko-commons:$anko_version"
+    // Anko Layouts
+    implementation "org.jetbrains.anko:anko-appcompat-v7:$anko_version"
+    // RecyclerView-v7
+    implementation "org.jetbrains.anko:anko-recyclerview-v7:$anko_version"
+    implementation "org.jetbrains.anko:anko-recyclerview-v7-coroutines:$anko_version"
+
     implementation 'com.google.code.gson:gson:2.8.1'
 
     implementation 'com.xwray:groupie:2.1.0'
     implementation 'com.xwray:groupie-kotlin-android-extensions:2.1.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
-
-    // Anko Commons
-    implementation "org.jetbrains.anko:anko-commons:$anko_version"
-
-    // Anko Layouts
-    implementation "org.jetbrains.anko:anko-appcompat-v7:$anko_version"
-
-    // RecyclerView-v7
-    implementation "org.jetbrains.anko:anko-recyclerview-v7:$anko_version"
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
